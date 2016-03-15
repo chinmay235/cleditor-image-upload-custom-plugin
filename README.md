@@ -1,4 +1,4 @@
-#cleditor-imageupload-plugin
+#cleditor-imageupload-custom-plugin
 
 This is simple plug-in for [CLEditor](http://premiumsoftware.net/cleditor) simple, lightweight jQuery plugin (WYSIWYG editor). 
 
@@ -35,5 +35,52 @@ to "&lt;body&gt;" path:
 ```html
 	<textarea id="input" name="input"></textarea>	
 	<script src="js/bootstrap.min.js"></script>	
-```	
+```
+
+**config.php:**	
+```html
+<?php
+$imgDirectory = 'img/';
+```
+
+**image-upload.php:**	
+```html
+<?php
+include_once 'config.php';
+$fileName = $_FILES['imageName']['name'];
+$ext = substr(strrchr(strtolower($fileName), '.'), 1);
+$extArr = array('jpg', 'jpeg', 'gif', 'png', 'bmp');
+
+if (in_array($ext, $extArr)) {
+    $tmpFileName = $_FILES['imageName']['tmp_name'];
+    $newName = 'chimay235-' . time() . '-' . $fileName . $ext;
+    move_uploaded_file($tmpFileName, $imgDirectory . $newName);
+    echo '<div id="image">' . $imgDirectory . $newName . '</div>';
+} else {
+    
+}
+?>	
+```
+
+**image-list.php:**	
+```html
+<?php
+include_once 'config.php';
+$images = glob($imgDirectory . "*.*"); //All images
+//$images = glob($imgDirectory . "*.jpg"); //Only jpg images
+
+//Show by date desc
+usort($images, function ($a, $b) {
+            return filemtime($b) - filemtime($a);
+        });
+
+$imgNames = array();
+foreach ($images as $image) {
+    $imgNames[] = $image;
+}
+echo json_encode($imgNames);
+?>
+```
+
+
 	
